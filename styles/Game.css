@@ -1,0 +1,38 @@
+.game .nav {
+  position: relative;
+  height: 3.5rem;
+  padding: 0 1.25rem;
+  padding-top: 1rem;
+  width: 100%;
+  color: #fff;
+}
+.game .nav > p {
+  font-size: 1rem;
+  height: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  float: right;
+  text-align: right;
+}
+.game .nav > p:first-child {
+  float: left;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.game .nav .center {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 3.5rem;
+  text-align: center;
+}
+.game .nav .center h1 {
+  font-family: 'Cinzel Decorative';
+  font-size: 2rem;
+}
+.game .nav a {
+  text-decoration: underline;
+}
