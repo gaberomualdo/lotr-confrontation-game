@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import Board from '../components/board';
-import CardBox from '../components/CardBox';
+import CardBox from '../components/cardBox';
 import Container from '../components/container';
 import SelectCards from '../components/selectCards';
 import Game from '../game/Game';
