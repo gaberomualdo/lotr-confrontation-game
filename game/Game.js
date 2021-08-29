@@ -1,5 +1,6 @@
 export default class Game {
   players = [];
+  spectators = [];
   playerSides = {};
   cards = {};
   constructor(events) {

@@ -25,8 +25,9 @@ const GamePage = () => {
   const { pin } = router.query;
   const [game, setGame] = useState(null);
   const [clientID, setClientID] = useState('');
+  const [spectators, setSpectators] = useState(null);
   const isSpectator = game && !game.players.includes(clientID);
-  const addEvent = (evt) => {
+  const addEvent = (evt, callback = () => {}) => {
     return new Promise((resolve) => {
       const db = firebase.database();
       const { pin } = router.query;
@@ -37,6 +38,7 @@ const GamePage = () => {
           const data = asArray(snapshot.val());
           data.push(evt);
           db.ref(pin).set(data);
+          callback();
           resolve();
         });
     });
@@ -51,15 +53,20 @@ const GamePage = () => {
       }
       const clientID = localStorage.getItem('lotr-client-id');
       setClientID(clientID);
-      db.ref(pin).on('value', (snapshot) => {
+      const pinRef = db.ref(pin);
+      pinRef.on('value', (snapshot) => {
         const data = asArray(snapshot.val());
         const newGame = new Game(data);
         setGame(newGame);
       });
+      db.ref(`presence/${pin}`).on('value', (snapshot) => {
+        const spectators = Object.keys(snapshot.val() || {});
+        setSpectators(spectators);
+      });
     })();
   }, [router.query]);
 
-  if (!game) {
+  if (!game || !spectators) {
     return (
       <Container className='flex items-center justify-center'>
         <h1 className='px-8 py-4 text-2xl text-blue-600 bg-white rounded-md shadow-xl'>Loading...</h1>
@@ -72,6 +79,11 @@ const GamePage = () => {
       type: 'player-joined',
       clientID,
     });
+  }
+  if (game.players.length >= 2 && !game.players.includes(clientID) && !spectators.includes(clientID)) {
+    const userRef = firebase.database().ref(`presence/${pin}/${clientID}`);
+    userRef.onDisconnect().remove();
+    userRef.set(true);
   }
 
   let state = 'playing';
@@ -90,6 +102,8 @@ const GamePage = () => {
     }
   }
 
+  const spectatorsCount = spectators.length;
+
   return (
     <Container>
       <Head>
@@ -102,7 +116,7 @@ const GamePage = () => {
             <h1>LOTR: The Confrontation</h1>
           </div>
           <p>
-            Game Pin: {pin || ''}
+            Game Pin: {pin || ''} &bull; Players: {game.players ? game.players.length : 0} &bull; Spectators: {spectatorsCount}
             <br />
             <Link href='/resources.pdf'>
               <a target='_blank'>Game Resources</a>
